@@ -276,6 +276,27 @@ def getCurrentTime():
     return local_time
 
 
+def setStartUpMode(local_time):
+    print('[debug] setStartUpMode():', local_time)
+    # key time points
+    # tp_6am = (6, 0)  # 6h 0m
+    # tp_10pm = (22, 0)  # 22h 0m
+    # tp_0am = (0, 0)  # 0h 0m
+
+    h = local_time.hour
+    # m = local_time.minute
+
+    new_mode = -1
+    if 0 <= h and h < 6:
+        new_mode = 2
+    elif 6 <= h and h < 22:
+        new_mode = 0
+    else:
+        new_mode = 1
+
+    return new_mode
+
+
 def checkAndSwitchMode(local_time, current_mode):
     print('[debug] checkAndSwitchMode():', local_time)
     # key time points
@@ -388,7 +409,7 @@ def sendMsgTo3B1(msg, lang, requests):
     myData = {'message': msg, 'language': lang}
     print('[debug sendMsgTo3B1()] posting:', msg)
     res = requests.post(host, data=myData)
-    print('[debug sendMsgTo3B1()] response:', res)
+    print('[debug sendMsgTo3B1()] response.status_code:', res.status_code)
 
     return 'sending message done!'
 
@@ -407,9 +428,11 @@ bonus_box = {30: 5, 60: 15, 90: 25, 120: 35}
 # get current time from internet
 local_time = getCurrentTime()
 print('[debug] current time from internet:', local_time)
-mode, changed = checkAndSwitchMode(local_time, 0)
+mode = setStartUpMode(local_time)
+changed = False
+# mode, changed = checkAndSwitchMode(local_time, 0)
 print('[debug] startup mode is:', mode)
-prev_mode = 0
+prev_mode = -1
 
 
 # ---------------------------------------------------
@@ -551,6 +574,7 @@ while True:
                 mode = 1.5
             # MEMO: when mode changed from 0 to 1 -> end of the day
             elif (prev_mode, mode) == (0, 1):
+                prev_300 = -300
                 if is_in:
                     # calculate this duration result
                     p_today += points + bonus

@@ -20,5 +20,5 @@ secrets = {
     'db-user': 'YOURS',
     'db-passwd': 'YOURS',
     # to access NodeRed on raspi
-    'raspi_announce': 'http://RASPI-IP/announcement'
+    'raspi_announce': 'http://RASPI-IP:PORT/announcement'
 }
